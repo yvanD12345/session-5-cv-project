@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="fr">
+<body>
+
+<form class = "register" action="/incription" method="POST">
+
+    <div class = "form setup">
+        <input type="firstname" class = "login-input" name = "firstname" placeholder="prenom" id="champ1" 
+        onkeyup = "verifierchamp()"/>
+    </div>
+    <div class = "form setup">
+        <input type="lastname" class = "login-input" name = "lastname" placeholder="nom" id="champ4" 
+        onkeyup = "verifierchamp()"/> 
+    </div>
+    <div class = "form setup">
+        <input type="email" class = "login-input" name = "email" placeholder="email"  
+        onkeyup = "verifierchamp()"/> 
+    </div>
+    <div class = "form setup">
+        <input type="password" class = "login-input" name = "password" placeholder="mot de passe" id="champ3" 
+        onkeyup = "verifierchamp()"/> 
+    </div>
+    <div class = "form setup">
+        <button type="submit" class = "submit" name = "submit" disabled>connection</button>
+    </div>
+
+</form>
+<a href="/views/connexion.ejs">vous avez deja un compte</a>
+
+<script>
+    function verifierchamp(){
+        if(champ1.value.length > 0 ){
+        document.getElementById("button").disabled = true;
+        }
+        else {
+            document.getElementById("button").disabled = false;
+        }
+    }
+</script>
+</body>
+</html>

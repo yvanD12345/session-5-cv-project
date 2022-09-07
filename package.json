@@ -1,0 +1,28 @@
+{
+  "name": "session-5-cv-project",
+  "version": "1.0.0",
+  "description": "node app cv",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yvanD12345/session-5-cv-project.git"
+  },
+  "author": "equipe-Yvan",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/yvanD12345/session-5-cv-project/issues"
+  },
+  "homepage": "https://github.com/yvanD12345/session-5-cv-project#readme",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "connect-mongodb-session": "^3.1.1",
+    "dotenv": "^16.0.2",
+    "express": "^4.18.1",
+    "express-flash": "^0.0.2",
+    "express-session": "^1.17.3",
+    "mongoose": "^6.5.4"
+  }
+}
