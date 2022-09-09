@@ -4,10 +4,31 @@ const session = require("express-session");
 const mongodb = require('connect-mongodb-session')(session);
 const userModel = require("./models/user");
 const app = express();
-const flash = require("express-flash");
-const titreSite = "Intellijob";
-const User = require("./models/user");
-const bcrypt = require('bcryptjs');
+const methodeOverride = require('method-override')
+const {
+    checkAuthenticated,
+    checkNotAuthenticated,
+}= require("./middleware/auth");
+
+const flash = require("express-flash")
+
+const titreSite = "Intellijob"
+const User = require("./models/user")
+const bcrypt = require('bcryptjs')
+
+const passport = require('passport')
+const initializePassport = require('./config-passport');
+const user = require('./models/user')
+
+initializePassport(passport,
+      async (email) => { 
+const userFound = User.findOne({email});
+return userFound;
+
+}, async(id) => {
+    const userFound = User.findOne({_id: id});
+return userFound;
+});
 const mongoURL = 'mongodb://localhost:27017/jobapp';
 require("dotenv").config();
 
@@ -34,18 +55,23 @@ app.use(
         resave: false,
         saveUnitialized: false,
     })
-);
-app.get("/", (req, res) => {
+)
+app.use(passport.initialize())
 
-res.redirect("/connexion");
+app.use(passport.session())
+app.use(methodeOverride('_method'))
+
+app.get("/", checkAuthenticated, (req, res) => {
+
+res.render("/homepage.ejs", {name : req.user.first_name});
 });
 
 
 // pour charger la page de connexion
-app.get("/connexion",  (req, res) => {
+app.get("/connexion", checkNotAuthenticated, (req, res) => {
     res.render("connexion", {
         titrePage: "Connexion",
-        titreSite: titreSite,
+        titreSite: titreSite
      //   ConnectedUser: currentlyConnectedUser,
     });
   /*  if (checkNotAuthenticated) {
@@ -53,10 +79,10 @@ app.get("/connexion",  (req, res) => {
     }
     /** */
 });
-app.get("/inscription",  (req, res) => {
+app.get("/inscription", checkNotAuthenticated, (req, res) => {
     res.render("inscription", {
         titrePage: "inscription",
-        titreSite: titreSite,
+        titreSite: titreSite
      //   ConnectedUser: currentlyConnectedUser,
     });
   /*  if (checkNotAuthenticated) {
@@ -64,9 +90,14 @@ app.get("/inscription",  (req, res) => {
     }
     /** */
 });
+app.post('/login', checkNotAuthenticated, passport.authenticate('local',{
+    successRedirect:'/homepage',
+    failureRedirect: '/connexion',
+    failureFlash: true
 
+}))
 // pour faire l'inscription
-app.post("/inscription", //checkNotAuthenticated
+app.post("/inscription",checkNotAuthenticated, //checkNotAuthenticated
  async(req, res) => {
    
     var userExist = await User.findOne({ email: req.body.email });
@@ -95,7 +126,12 @@ app.post("/inscription", //checkNotAuthenticated
             res.redirect("/inscription");
         }
     }
-});
+})
+
+app.delete('/logout', (req,res) =>{
+    req.logout()
+    res.redirect('/connexion');
+})
 
 //connection mongodb
 mongoose

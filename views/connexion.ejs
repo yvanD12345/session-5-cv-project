@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html lang="fr">
+    <% if (messages.error) { %>
+        <%= messages.error %>
+        <% } %>
 <body>
-
 <form class = "register" action="/incription" method="POST">
 
     <div class = "form setup">
@@ -20,7 +22,7 @@
 
     </div>
 </form>
-<a href="/views/incription.ejs">vous n'avez pas de compte</a>
+<a href="inscription">vous n'avez pas de compte</a>
 <script>
     function verifierchamp(){
         if(champ1.value.length > 0 && champ2.value.length > 0){

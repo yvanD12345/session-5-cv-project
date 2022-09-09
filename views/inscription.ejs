@@ -13,7 +13,7 @@
         onkeyup = "verifierchamp()"/> 
     </div>
     <div class = "form setup">
-        <input type="email" class = "login-input" name = "email" placeholder="email"  
+        <input type="email" class = "login-input" name = "email" placeholder="email" id="champ2"  
         onkeyup = "verifierchamp()"/> 
     </div>
     <div class = "form setup">
@@ -25,15 +25,15 @@
     </div>
 
 </form>
-<a href="/views/connexion.ejs">vous avez deja un compte</a>
+<a href="connexion">vous avez deja un compte</a>
 
 <script>
     function verifierchamp(){
-        if(champ1.value.length > 0 ){
-        document.getElementById("button").disabled = true;
+        if(champ1.value.length > 0 && champ3.value.length > 0 && champ4.value.length > 0 && champ2.value.length > 0){
+        document.getElementById("button").disabled = false;
         }
         else {
-            document.getElementById("button").disabled = false;
+            document.getElementById("button").disabled = true;
         }
     }
 </script>
