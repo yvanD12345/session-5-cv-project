@@ -29,7 +29,7 @@ return userFound;
     const userFound = User.findOne({_id: id});
 return userFound;
 });
-const mongoURL = 'mongodb://localhost:27017/jobapp';
+const mongoURL = 'mongodb+srv://jobcv:jobcv12345@cluster0.ea82ykn.mongodb.net/?retryWrites=true&w=majority';
 require("dotenv").config();
 
 
@@ -63,7 +63,7 @@ app.use(methodeOverride('_method'))
 
 app.get("/", checkAuthenticated, (req, res) => {
 
-res.render("/homepage.ejs", {name : req.user.first_name});
+res.render("homepage", {name : req.user.first_name});
 });
 
 
@@ -90,8 +90,8 @@ app.get("/inscription", checkNotAuthenticated, (req, res) => {
     }
     /** */
 });
-app.post('/login', checkNotAuthenticated, passport.authenticate('local',{
-    successRedirect:'/homepage',
+app.post('/connexion', checkNotAuthenticated, passport.authenticate('local',{
+    successRedirect:'/',
     failureRedirect: '/connexion',
     failureFlash: true
 
@@ -128,17 +128,21 @@ app.post("/inscription",checkNotAuthenticated, //checkNotAuthenticated
     }
 })
 
-app.delete('/logout', (req,res) =>{
-    req.logout()
-    res.redirect('/connexion');
-})
+app.delete("/logout", (req, res) => {
+    req.logout(req.user, err => {
+      if(err) return next(err);
+      res.redirect("/");
+    });
+  });
 
 //connection mongodb
 mongoose
     .connect(mongoURL, {
         useUnifiedTopology: true,
         useNewUrlParser: true,
+
     })
+    
     .then(() => {
         app.listen(3000, () => {
             console.log("listening on port 3000");

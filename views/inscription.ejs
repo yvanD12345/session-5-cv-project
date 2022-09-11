@@ -2,7 +2,7 @@
 <html lang="fr">
 <body>
 
-<form class = "register" action="/incription" method="POST">
+<form class = "register" action="/inscription" method="POST">
 
     <div class = "form setup">
         <input type="firstname" class = "login-input" name = "firstname" placeholder="prenom" id="champ1" 
@@ -21,7 +21,7 @@
         onkeyup = "verifierchamp()"/> 
     </div>
     <div class = "form setup">
-        <button type="submit" class = "submit" name = "submit" disabled>connection</button>
+        <button type="submit" id= "button" disabled>connection</button>
     </div>
 
 </form>
@@ -30,7 +30,7 @@
 <script>
     function verifierchamp(){
         if(champ1.value.length > 0 && champ3.value.length > 0 && champ4.value.length > 0 && champ2.value.length > 0){
-        document.getElementById("button").disabled = false;
+        document.getElementById("button").disabled =false;
         }
         else {
             document.getElementById("button").disabled = true;
