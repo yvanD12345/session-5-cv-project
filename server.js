@@ -1,9 +1,11 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const session = require("express-session");
+const alert = require("alert-node");
 const mongodb = require('connect-mongodb-session')(session);
 const userModel = require("./models/user");
 const app = express();
+userCurrentlyLogged = null;
 const methodeOverride = require('method-override')
 const {
     checkAuthenticated,
@@ -66,6 +68,52 @@ app.get("/", checkAuthenticated, (req, res) => {
 res.render("homepage", {name : req.user.first_name});
 });
 
+app.post("/changerPassword",checkAuthenticated, async (req,res) => {
+console.log(userCurrentlyLogged.email);
+console.log(userCurrentlyLogged.password);
+ if(req.body.newpsw != req.body.confirmnewpsw){
+    
+    alert("the content of new password field and confirm new password doesn't match");
+ } else{
+    if (
+        await bcrypt.compare(
+            req.body.oldpsw,
+            userCurrentlyLogged.password
+        )
+    ) {
+        console.log("tkt");
+        const hashednewPsw = await bcrypt.hash(req.body.newpsw, 10);
+
+        userCurrentlyLogged.password = hashednewPsw;
+        User.findOneAndUpdate
+			const temp = await User.findOneAndUpdate(
+				{ _id: userCurrentlyLogged._id },
+				{ password: hashednewPsw }
+			);
+    }
+    res.redirect('/homepage');
+   
+
+ 
+ }
+});
+app.get("/homepage",checkAuthenticated,(req,res)=>{
+app.res.render("homepage", {
+        titrePage: titreSite,
+        titreSite: titreSite,
+        name: userCurrentlyLogged.first_name +
+            " " +
+            userCurrentlyLogged.last_name,
+        ConnectedUser: currentlyConnectedUser,
+})
+});
+
+app.get("/changerPassword",checkAuthenticated,(req,res)=> {
+    res.render("changerPassword",{
+     titrePage : "changerPassword",
+     titreSite : titreSite,
+    });
+})
 
 // pour charger la page de connexion
 app.get("/connexion", checkNotAuthenticated, (req, res) => {
@@ -79,6 +127,19 @@ app.get("/connexion", checkNotAuthenticated, (req, res) => {
     }
     /** */
 });
+async function saveUserLogged(req,res,next){
+ const userFound = await User.findOne({email:req.body.email});
+ console.log(userFound.email);
+ console.log(userFound.password);
+
+ if(userFound) {
+    userCurrentlyLogged = userFound;
+
+ } else{
+    console.log("email incorrect");
+ }
+ next();
+}
 app.get("/inscription", checkNotAuthenticated, (req, res) => {
     res.render("inscription", {
         titrePage: "inscription",
@@ -90,12 +151,13 @@ app.get("/inscription", checkNotAuthenticated, (req, res) => {
     }
     /** */
 });
-app.post('/connexion', checkNotAuthenticated, passport.authenticate('local',{
+app.post('/connexion', saveUserLogged,checkNotAuthenticated, passport.authenticate('local',{
     successRedirect:'/',
     failureRedirect: '/connexion',
-    failureFlash: true
+    failureFlash: true,
+}),async (req, res) => {} 
 
-}))
+);
 // pour faire l'inscription
 app.post("/inscription",checkNotAuthenticated, //checkNotAuthenticated
  async(req, res) => {
@@ -129,9 +191,11 @@ app.post("/inscription",checkNotAuthenticated, //checkNotAuthenticated
 })
 
 app.delete("/logout", (req, res) => {
+    userCurrentlyLogged = null;
     req.logout(req.user, err => {
       if(err) return next(err);
       res.redirect("/");
+
     });
   });
 

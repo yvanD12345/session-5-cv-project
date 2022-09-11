@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/yvanD12345/session-5-cv-project#readme",
   "dependencies": {
+    "alert-node": "^5.0.3",
     "bcryptjs": "^2.4.3",
     "connect-mongodb-session": "^3.1.1",
     "dotenv": "^16.0.2",
