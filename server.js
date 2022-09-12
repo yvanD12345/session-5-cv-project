@@ -8,6 +8,8 @@ const alert = require("alert-node");
 const mongodb = require('connect-mongodb-session')(session);
 const userModel = require("./models/user");
 const app = express();
+const port = 3000
+
 
 userCurrentlyLogged = null;
 const methodeOverride = require('method-override')
@@ -37,7 +39,7 @@ return userFound;
     const userFound = User.findOne({_id: id});
 return userFound;
 });
-const mongoURL = 'mongodb+srv://jobcv:jobcv12345@cluster0.ea82ykn.mongodb.net/?retryWrites=true&w=majority';
+const mongoURL = 'mongodb://localhost:27017';
 require("dotenv").config();
 
 
@@ -308,15 +310,30 @@ app.delete("/logout", (req, res) => {
   });
 
 //connection mongodb
-mongoose
-    .connect(mongoURL, {
-        useUnifiedTopology: true,
-        useNewUrlParser: true,
+app.listen(port, () => {
 
-    })
-    
-    .then(() => {
-        app.listen(3000, () => {
-            console.log("listening on port 3000");
-        });
+    console.log(`Server's on localhost:${port}`)
+
+})
+
+// Connexion à MongoDB
+
+mongoose
+
+.connect("mongodb://localhost:27017/Calibre", {
+
+    useUnifiedTopology: true,
+
+    useNewUrlParser: true,
+
+})
+
+.then(() => {
+
+    app.listen(3000, () => {
+
+        console.log("listening on port 3000");
+
     });
+
+});
