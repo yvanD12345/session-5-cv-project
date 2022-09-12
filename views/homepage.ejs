@@ -1,8 +1,23 @@
-
+<!DOCTYPE html>
+<html lang="fr">
 <h1>hi <%= name %></h1>
 
 <form action="/logout?_method=DELETE" method="POST">
 
     <button type="submit">Log out</button>
+    
+    <% if( checkCvs == false){ %>
+    <div class="form-control">
+        <label for="cv ">choissisez un cv : </label>
+        <select id="titre_cv" name="titre_cv">
+            <% user_Cvs.forEach(function(item,index){%>
+                <option value="<%=item.id %>" on>
+                    <%= item.title %>
+                </option>
+                <%}); %>
+        </select>
+    </div>
+    <%}; %>
 </form>
 <a href="changerPassword">changer le mot de passe</a>
+<a href="creationcv">creer un cv</a>

@@ -1,3 +1,6 @@
+
+
+
 const express = require('express');
 const mongoose = require('mongoose');
 const session = require("express-session");
@@ -5,6 +8,7 @@ const alert = require("alert-node");
 const mongodb = require('connect-mongodb-session')(session);
 const userModel = require("./models/user");
 const app = express();
+
 userCurrentlyLogged = null;
 const methodeOverride = require('method-override')
 const {
@@ -16,11 +20,13 @@ const flash = require("express-flash")
 
 const titreSite = "Intellijob"
 const User = require("./models/user")
+const Cv = require("./models/cv")
 const bcrypt = require('bcryptjs')
 
 const passport = require('passport')
 const initializePassport = require('./config-passport');
 const user = require('./models/user')
+const createdPdf = null
 
 initializePassport(passport,
       async (email) => { 
@@ -68,6 +74,19 @@ app.get("/", checkAuthenticated, (req, res) => {
 res.render("homepage", {name : req.user.first_name});
 });
 
+app.post("/creationcv",checkAuthenticated,
+async(req,res) =>{
+const newCv = new Cv({
+    first_name: req.body.firstname,
+    last_name: req.body.lastname,
+    email: req.body.email,
+    user_id: userCurrentlyLogged._id,
+    title: req.body.title,
+});
+
+await newCv.save();
+res.redirect("/homepage");
+});
 app.post("/changerPassword",checkAuthenticated, async (req,res) => {
 console.log(userCurrentlyLogged.email);
 console.log(userCurrentlyLogged.password);
@@ -97,16 +116,47 @@ console.log(userCurrentlyLogged.password);
  
  }
 });
-app.get("/homepage",checkAuthenticated,(req,res)=>{
-app.res.render("homepage", {
-        titrePage: titreSite,
+app.get("/creationcv",checkAuthenticated,(req,res)=>{
+    res.render("creationcv",{
         titreSite: titreSite,
-        name: userCurrentlyLogged.first_name +
-            " " +
-            userCurrentlyLogged.last_name,
-        ConnectedUser: currentlyConnectedUser,
-})
+        titrePage:"creation de cv",
+    });
 });
+
+app.get("/homepage",checkAuthenticated,(req,res)=>{
+    Cv.find({user_id:userCurrentlyLogged._id},function(err,Cvs){
+        if(Cvs == null){
+            const checkifCvsIsNull = true;
+            res.render("homepage", {
+                titrePage: titreSite,
+                titreSite: titreSite,
+                name: userCurrentlyLogged.first_name +
+                    " " +
+                    userCurrentlyLogged.last_name,
+                ConnectedUser: userCurrentlyLogged,
+                user_Cvs: Cvs,
+                checkCvs: checkifCvsIsNull,
+            
+        });
+    }
+    else{
+        const checkifCvsIsNull = false;
+        res.render("homepage", {
+            titrePage: titreSite,
+            titreSite: titreSite,
+            name: userCurrentlyLogged.first_name +
+                " " +
+                userCurrentlyLogged.last_name,
+            ConnectedUser: userCurrentlyLogged,
+            user_Cvs: Cvs,
+            checkCvs: checkifCvsIsNull,
+        
+    });
+    }
+
+});
+});
+
 
 app.get("/changerPassword",checkAuthenticated,(req,res)=> {
     res.render("changerPassword",{
@@ -152,7 +202,7 @@ app.get("/inscription", checkNotAuthenticated, (req, res) => {
     /** */
 });
 app.post('/connexion', saveUserLogged,checkNotAuthenticated, passport.authenticate('local',{
-    successRedirect:'/',
+    successRedirect:'/homepage',
     failureRedirect: '/connexion',
     failureFlash: true,
 }),async (req, res) => {} 
@@ -189,6 +239,64 @@ app.post("/inscription",checkNotAuthenticated, //checkNotAuthenticated
         }
     }
 })
+async function createCv(res,req){
+const thecv = cv.findOne({user_id : userCurrentlyLogged._id});
+
+if(thecv){
+    // Create a document
+const doc = new PDFDocument();
+  
+// Saving the pdf file in root directory.
+doc.pipe(fs.createWriteStream('example.pdf'));
+  
+// Adding functionality
+doc
+   
+  .fontSize(27)
+  .text('name : '+thecv.first_name+'/n', 100, 100);
+doc
+  .fontSize(27)
+  .text('email:'+thecv.email,100,100);
+
+  
+// Adding an image in the pdf.
+  
+  /*doc.image('download3.jpg', {
+    fit: [300, 300],
+    align: 'center',
+    valign: 'center'
+  });
+  */
+  doc
+  .addPage()
+  .fontSize(15)
+  .text('Generating PDF with the help of pdfkit', 100, 100);
+   
+  
+   
+// Apply some transforms and render an SVG path with the 
+// 'even-odd' fill rule
+doc
+  .scale(0.6)
+  .translate(470, -380)
+  .path('M 250,75 L 323,301 131,161 369,161 177,301 z')
+  .fill('red', 'even-odd')
+  .restore();
+   
+// Add some text with annotations
+doc
+  .addPage()
+  .fillColor('blue')
+  .text('The link for GeeksforGeeks website', 100, 100)
+    
+  .link(100, 100, 160, 27, 'https://www.geeksforgeeks.org/');
+   
+// Finalize PDF file
+doc.end();
+createdPdf = doc;
+}
+
+}
 
 app.delete("/logout", (req, res) => {
     userCurrentlyLogged = null;
