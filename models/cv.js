@@ -1,28 +1,13 @@
 
 
-const mongoose = require('mongoose');
+const mongoose = require('./db.js');
 const schema = new mongoose.Schema ({
-    first_name: {
-		type: String,
-		required: true,
-	},
-	last_name: {
-		type: String,
-		required: true,
-	},
-	email: {
-		type: String,
-		required: true,
-	},
-    user_id : {
-        type: String, required: true 
-    },
-    title:{
-        type: String, required:true
-    },
+	first_name:String,
+	last_name: String,
+	email: String,
+	user_id: String,
+	title: String
 })
-    const cv = mongoose.model("cv", schema);
 
 // pour l'acces dans les autres fichiers
-module.exports = cv;
-
+module.exports=mongoose.model('cv',cv,'cvs');

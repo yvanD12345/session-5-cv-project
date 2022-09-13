@@ -1,3 +1,5 @@
+//FONCTION POUR AUTHENTIFER L'UTILISATEUR
+
 function checkAuthenticated(req, res, next){
     if(req.isAuthenticated()){
 
